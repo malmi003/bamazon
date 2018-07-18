@@ -117,7 +117,38 @@ function AddToInv() {
 
 //   * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
 function AddNewProduct() {
+    inquirer.prompt([
+        {
+            name: "name",
+            type: "input",
+            message: "Enter name of the new item:"
+        },
+        {
+            name: "price",
+            type: "input",
+            message: "Enter the price of the new item (omit $ sign):"
+        },
+        {
+            name: "quantity",
+            type: "input",
+            message: "Enter starting stock quantity of the new item:"
+        },
+    ]).then(answers => {
+        connection.query(
+            "INSERT INTO products SET ?",
+            {
+                product_name: answers.name,
+                price: answers.price,
+                stock_quantity: answers.quantity,
+            },
+            function (err, res) {
+                if (err) throw err;
+                console.log("Your item was successfully added. \n")
 
+                returnToMenuPrompt(); 
+            }
+        )
+    })
 };
 
 function returnToMenuPrompt() {
