@@ -28,10 +28,10 @@ function listMenuOptions() {
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
         }
     ).then(answer => {
-        console.log(answer);
+        // console.log(answer);
 
-        switch(answer) {
-            case "View Products for Sale": 
+        switch (answer.menuOptions) {
+            case "View Products for Sale":
                 viewProducts();
                 break;
             case "View Low Inventory":
@@ -45,19 +45,33 @@ function listMenuOptions() {
                 break;
         }
     })
-    
-    //will likely need to move
-    connection.end();
 }
 
 //   * If a manager selects `View Products for Sale`, the app should list every available item: the item IDs, names, prices, and quantities.
 function viewProducts() {
-    
+    connection.query("SELECT * from products", function (err, res) {
+        if (err) throw err;
+
+        // console.log(res);
+        res.forEach(item => {
+            console.log(`ID: ${item.item_id}, Item: ${item.product_name}, Price: ${item.price}, Quantity: ${item.stock_quantity}`)
+        })
+        returnToMenuPrompt();
+    })
 };
 
 //   * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
 function viewLowInv() {
+    connection.query("SELECT * FROM products where stock_quantity < 5", function(err, res) {
+        if (err) throw err;
 
+        // console.log(res);
+        res.forEach(item => {
+            console.log(`ID: ${item.item_id}, Item: ${item.product_name}, Price: ${item.price}, Quantity: ${item.stock_quantity}`);
+        })
+    
+        returnToMenuPrompt();        
+    })
 };
 
 //   * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
@@ -68,4 +82,17 @@ function AddToInv() {
 //   * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
 function AddNewProduct() {
 
+};
+
+function returnToMenuPrompt() {
+    inquirer.prompt({
+        name: "return to menu",
+        type: "confirm",
+        message: "Return to main menu?"
+    }).then(answer => {
+        console.log(answer);
+        if (answer["return to menu"]) {
+            listMenuOptions();
+        } else connection.end();
+    })
 };
