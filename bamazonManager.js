@@ -62,21 +62,57 @@ function viewProducts() {
 
 //   * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
 function viewLowInv() {
-    connection.query("SELECT * FROM products where stock_quantity < 5", function(err, res) {
+    connection.query("SELECT * FROM products where stock_quantity < 5", function (err, res) {
         if (err) throw err;
 
         // console.log(res);
         res.forEach(item => {
             console.log(`ID: ${item.item_id}, Item: ${item.product_name}, Price: ${item.price}, Quantity: ${item.stock_quantity}`);
         })
-    
-        returnToMenuPrompt();        
+
+        returnToMenuPrompt();
     })
 };
 
 //   * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
 function AddToInv() {
+    inquirer.prompt([
+        {
+            name: "invId",
+            type: "input",
+            message: "Enter the ID number of the item you'd like to update."
 
+        },
+        {
+            name: "quantAdj",
+            type: "input",
+            message: "Enter the quantity you'd like to add."
+        }
+    ]).then(answers => {
+        console.log(answers);
+
+        connection.query(
+            "SELECT * FROM products WHERE item_id = " + answers.invId, function (err, res) {
+                if (err) throw err;
+
+                connection.query(
+                    "UPDATE products SET ? WHERE ?",
+                    [
+                        {
+                            stock_quantity: parseFloat(res[0].stock_quantity) + parseFloat(answers.quantAdj)
+                        },
+                        {
+                            item_id: answers.invId
+                        }
+                    ],
+                    function (err) {
+                        if (err) throw err;
+                    }
+                )
+            })
+
+        returnToMenuPrompt();
+    });
 };
 
 //   * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
@@ -90,7 +126,7 @@ function returnToMenuPrompt() {
         type: "confirm",
         message: "Return to main menu?"
     }).then(answer => {
-        console.log(answer);
+        // console.log(answer);
         if (answer["return to menu"]) {
             listMenuOptions();
         } else connection.end();
