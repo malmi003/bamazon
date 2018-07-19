@@ -14,7 +14,7 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
 
-    //run function after connection is made
+    //run function after connection is made, lists menu options
     listMenuOptions();
 });
 
@@ -28,8 +28,7 @@ function listMenuOptions() {
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
         }
     ).then(answer => {
-        // console.log(answer);
-
+        //switch statement, takes selected option and runs corresponding function
         switch (answer.menuOptions) {
             case "View Products for Sale":
                 viewProducts();
@@ -44,38 +43,42 @@ function listMenuOptions() {
                 AddNewProduct();
                 break;
         }
-    })
-}
+    });
+};
 
-//   * If a manager selects `View Products for Sale`, the app should list every available item: the item IDs, names, prices, and quantities.
+//if select `View Products for Sale`, the app lists every available item
 function viewProducts() {
+    //query DB
     connection.query("SELECT * from products", function (err, res) {
         if (err) throw err;
 
-        // console.log(res);
+        // res returns array, below consoles each product available for purchase 
         res.forEach(item => {
-            console.log(`ID: ${item.item_id}, Item: ${item.product_name}, Price: ${item.price}, Quantity: ${item.stock_quantity}`)
-        })
+            console.log(`ID: ${item.item_id}, Item: ${item.product_name}, Price: ${item.price}, Quantity: ${item.stock_quantity}`);
+        });
+        //return to menu or close DB connection
         returnToMenuPrompt();
-    })
+    });
 };
 
-//   * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
+//if select `View Low Inventory`, lists all items with an inventory count lower than five.
 function viewLowInv() {
+    // query DB
     connection.query("SELECT * FROM products where stock_quantity < 5", function (err, res) {
         if (err) throw err;
 
-        // console.log(res);
+        // res returns array, below consoles each product w/ inv less than 5
         res.forEach(item => {
             console.log(`ID: ${item.item_id}, Item: ${item.product_name}, Price: ${item.price}, Quantity: ${item.stock_quantity}`);
-        })
-
+        });
+        //return to menu or close DB connection
         returnToMenuPrompt();
-    })
+    });
 };
 
-//   * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
+//If select `Add to Inventory`, displays prompt to "add more" of any item currently in the store
 function AddToInv() {
+    //asks which item you'd like to change inv and by how much
     inquirer.prompt([
         {
             name: "invId",
@@ -89,12 +92,12 @@ function AddToInv() {
             message: "Enter the quantity you'd like to add."
         }
     ]).then(answers => {
-        console.log(answers);
-
+        // query DB for the item that matches the requested ID
         connection.query(
             "SELECT * FROM products WHERE item_id = " + answers.invId, function (err, res) {
                 if (err) throw err;
 
+                //then updates that products inv
                 connection.query(
                     "UPDATE products SET ? WHERE ?",
                     [
@@ -108,15 +111,16 @@ function AddToInv() {
                     function (err) {
                         if (err) throw err;
                     }
-                )
-            })
-
+                );
+            });
+        //return to menu or close DB connection
         returnToMenuPrompt();
     });
 };
 
-//   * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
+//If selects `Add New Product`, allows the manager to add a completely new product to the store
 function AddNewProduct() {
+    //asks for the info necessary to add the item
     inquirer.prompt([
         {
             name: "name",
@@ -134,6 +138,7 @@ function AddNewProduct() {
             message: "Enter starting stock quantity of the new item:"
         },
     ]).then(answers => {
+        //adds item to DB
         connection.query(
             "INSERT INTO products SET ?",
             {
@@ -141,25 +146,29 @@ function AddNewProduct() {
                 price: answers.price,
                 stock_quantity: answers.quantity,
             },
+            //consoles item was successfully added
             function (err, res) {
                 if (err) throw err;
                 console.log("Your item was successfully added. \n")
-
-                returnToMenuPrompt(); 
+                //return to menu or close DB connection
+                returnToMenuPrompt();
             }
-        )
-    })
+        );
+    });
 };
-
+//function to return to main menu or close connection
 function returnToMenuPrompt() {
+    //prompts the user to return to menu
     inquirer.prompt({
         name: "return to menu",
         type: "confirm",
         message: "Return to main menu?"
     }).then(answer => {
-        // console.log(answer);
+        //if yes, list menu options
         if (answer["return to menu"]) {
             listMenuOptions();
+
+            //if no, close DB connection
         } else connection.end();
-    })
+    });
 };
