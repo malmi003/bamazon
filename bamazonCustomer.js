@@ -39,12 +39,22 @@ function itemPrompt() {
         {
             name: "id",
             type: "input",
-            message: "Enter the item number you'd like to purchase."
+            message: "Enter the item number you'd like to purchase.",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                } return false;
+            }
         },
         {
             name: "quantity",
             type: "input",
-            message: "Enter the quantity of units you'd like to purchase."
+            message: "Enter the quantity of units you'd like to purchase.",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                } return false;
+            }
         }
 
         //once they've responded...
