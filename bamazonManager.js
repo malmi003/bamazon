@@ -83,13 +83,23 @@ function AddToInv() {
         {
             name: "invId",
             type: "input",
-            message: "Enter the ID number of the item you'd like to update."
+            message: "Enter the ID number of the item you'd like to update.",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                } return false;
+            }
 
         },
         {
             name: "quantAdj",
             type: "input",
-            message: "Enter the quantity you'd like to add."
+            message: "Enter the quantity you'd like to add.",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                } return false;
+            }
         }
     ]).then(answers => {
         // query DB for the item that matches the requested ID
@@ -130,12 +140,22 @@ function AddNewProduct() {
         {
             name: "price",
             type: "input",
-            message: "Enter the price of the new item (omit $ sign):"
+            message: "Enter the price of the new item (omit $ sign):",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                } return false;
+            }
         },
         {
             name: "quantity",
             type: "input",
-            message: "Enter starting stock quantity of the new item:"
+            message: "Enter starting stock quantity of the new item:",
+            validate: function (value) {
+                if (isNaN(value) === false) {
+                    return true;
+                } return false;
+            }
         },
     ]).then(answers => {
         //adds item to DB
