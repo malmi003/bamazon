@@ -4,10 +4,7 @@ This app was intended to create an Amazon-like storefront that takes orders from
 
 ## How it works - Customer Side
 
-Start by running `node bamazonCustomer.js` in your terminal. Running this will first prompt you with a list of all items available for purchase: 
-![image1](/readMeImages/img2.png)
-
-Then you are able to enter the item ID and quantity you would like to purchase.
+Start by running `node bamazonCustomer.js` in your terminal. Running this will first show you with a list of all items available for purchase. Then you are prompted to enter the item ID and quantity you would like to purchase.
 
 Once the purchase has been made, the total order will be displayed on the terminal and the order will be deducted from inventory in the database. 
 ![image2](/readMeImages/img3.png)
